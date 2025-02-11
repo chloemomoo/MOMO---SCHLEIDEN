@@ -1,0 +1,45 @@
+import math
+from turtle import *
+
+# Set up the screen and turtle
+bgcolor("white")
+speed(0)
+pensize(2)
+shape("turtle")
+
+# Define heart equations
+def hearta(k):
+    return 16 * math.sin(k) ** 3
+
+def heartb(k):
+    return 13 * math.cos(k) - 5 * math.cos(2 * k) - 2 * math.cos(3 * k) - math.cos(4 * k)
+
+# Create a gradient effect by changing colors dynamically
+def get_color(k):
+    """Generate a color that changes based on k for a gradient effect"""
+    r = (math.sin(k) + 1) / 2  # Generate a red gradient from 0 to 1
+    g = (math.cos(k) + 1) / 2  # Generate a green gradient from 0 to 1
+    b = (math.sin(k + 3) + 1) / 2  # Generate a blue gradient from 0 to 1
+    return (r, g, b)
+
+# Draw the heart with dynamic color and swirling effect
+penup()
+for i in range(0, 628, 1):  # Going from 0 to 2*pi in steps
+    x = hearta(i) * 20  # Scale the x-coordinate
+    y = heartb(i) * 20  # Scale the y-coordinate
+    
+    # Change color dynamically
+    color(get_color(i)) 
+    
+    # Move to the (x, y) position
+    goto(x, y)  
+    pendown()  # Start drawing
+
+    # Add some rotation to create a swirling effect
+    setheading(i * 0.3)  # Rotate slightly based on the angle i
+
+# Hide the turtle after drawing
+hideturtle()
+
+# Keep the window open
+done()
