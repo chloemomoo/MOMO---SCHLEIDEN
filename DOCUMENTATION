@@ -1,0 +1,138 @@
+Got it! Here’s a detailed breakdown of the features in your Expense Tracker program:
+
+⸻
+
+1. File Management Features
+
+a. Expense Storage (expenses.csv)
+	•	The program stores all expense entries in a CSV file (expenses.csv), ensuring that data persists even after the program is closed.
+	•	Each row in the CSV file contains:
+	•	Date & Time (when the expense was recorded)
+	•	Category (Food, Transport, Bills, etc.)
+	•	Amount (how much was spent)
+	•	Currency (PHP, USD, EUR, etc.)
+	•	Description (brief note about the expense)
+
+b. Budget and Savings Storage (budget.txt & goal.txt)
+	•	budget.txt stores the user-defined monthly budget
+	•	goal.txt stores the savings goal
+
+These files help track the user’s financial limits and savings progress.
+
+⸻
+
+2. User-Friendly Console Features
+
+a. Greeting System (Personalized Messages Based on Time of Day)
+	•	When the program starts, it greets the user based on the current time:
+	•	🌞 Morning (5 AM - 12 PM) → “Good morning! Time to track your expenses smartly!”
+	•	🌤 Afternoon (12 PM - 6 PM) → “Good afternoon! Let’s keep your finances in check!”
+	•	🌙 Evening (6 PM - 5 AM) → “Good evening! Time to review your spending today!”
+
+This makes the program feel more interactive and engaging.
+
+b. Colorful Console Messages
+	•	Uses ANSI color codes to display different types of messages in different colors:
+	•	✅ Success Messages → Green
+	•	❌ Errors/Warnings → Red
+	•	💡 General Information → Cyan
+	•	🚨 Budget Alerts → Yellow
+
+This makes messages easier to read and improves the user experience.
+
+⸻
+
+3. Expense Management Features
+
+a. Add an Expense
+	•	Users input:
+	•	Category (e.g., Food, Bills, Shopping)
+	•	Amount (e.g., 100.50)
+	•	Currency (default: PHP)
+	•	Description (e.g., “Lunch at Jollibee”)
+	•	The expense is saved in expenses.csv and confirmed with a success message.
+
+b. View All Expenses
+	•	Reads expenses.csv and displays all recorded expenses in a table format:
+
+Date & Time           Category      Amount     Currency    Description
+----------------------------------------------------------------------
+2025-03-26 10:30:00   Food         150.00     PHP         Breakfast at Starbucks
+2025-03-26 14:15:00   Transport    50.00      PHP         Jeepney fare
+
+
+	•	If no expenses exist, the program displays a message:
+❌ “No expenses recorded yet. Start tracking now!”
+
+c. Calculate Total Expenses
+	•	Sums up all expenses in PHP currency and displays the total spent so far.
+	•	Planned feature: Currency conversion to sum up expenses from different currencies.
+
+d. Filter Expenses by Category
+	•	Allows the user to view only specific expenses by filtering the list by category.
+	•	Example: If the user searches for “Food”, it only displays expenses under the Food category.
+
+e. Delete an Expense
+	•	The program displays all recorded expenses with a row number.
+	•	The user selects the row number to delete.
+	•	The expense is removed from expenses.csv.
+	•	If the user inputs an invalid row number, an error message appears.
+
+⸻
+
+4. Budget & Savings Tracking Features
+
+a. Set a Monthly Budget
+	•	The user enters a budget amount (e.g., ₱5,000).
+	•	This amount is saved in budget.txt.
+	•	A confirmation message appears:
+✅ “🎯 Monthly budget of ₱5,000 set!”
+
+b. Check If Budget is Exceeded
+	•	The program calculates total expenses and compares them to the budget.
+	•	If expenses exceed the budget, a red warning message appears:
+🚨 “You have exceeded your budget by ₱1,500!”
+	•	If expenses are within the budget, a green success message appears:
+✅ “You are within your budget. You’ve spent ₱3,200 of your ₱5,000 budget.”
+
+c. Set a Savings Goal
+	•	The user enters a savings goal amount (e.g., ₱10,000).
+	•	This amount is saved in goal.txt.
+	•	A confirmation message appears:
+✅ “🎯 Your savings goal of ₱10,000 has been set!”
+
+d. Check Progress Towards Savings Goal
+	•	The program compares the savings goal to total expenses.
+	•	If the user still needs to save more, it shows:
+💰 “Keep going! You need to save ₱7,000 more to reach your goal of ₱10,000.”
+	•	If the savings goal is met, a celebratory message appears:
+🎉 “Congratulations! You’ve reached your savings goal of ₱10,000!”
+🎉 “Confetti time!”
+
+⸻
+
+5. Fun and Interactive Features
+
+a. Random Savings Challenges
+	•	A fun, gamified feature that encourages better spending habits.
+	•	The program randomly selects a money-saving challenge:
+	•	“Can you keep your coffee under ₱100 this week?”
+	•	“Try saving 10% of your expenses for the next week!”
+	•	“Buy lunch for less than ₱150 today!”
+	•	This keeps the user engaged and motivates better budgeting.
+
+⸻
+
+6. User Input Validation and Error Handling
+	•	Incorrect Inputs (e.g., entering letters instead of numbers) are handled properly:
+	•	If the user enters an invalid amount, the program shows:
+❌ “Oops! That doesn’t look like a valid amount. Try again!”
+	•	If the user selects an invalid row number for deletion, the program warns them.
+	•	If the user enters an unknown currency, the program defaults to PHP and displays:
+⚠️ “Unknown currency, setting default to PHP.”
+
+⸻
+
+Final Thoughts
+
+This Expense Tracker is a fun, interactive, and useful tool to help users track their expenses, manage budgets, and save money. It makes expense tracking less boring by adding colorful messages, challenges, and personalized greetings.
