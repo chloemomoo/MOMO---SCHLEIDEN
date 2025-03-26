@@ -1,0 +1,277 @@
+import csv
+import os
+import datetime
+import random
+import time
+
+# File to store expenses
+EXPENSE_FILE = "expenses.csv"
+BUDGET_FILE = "budget.txt"
+GOAL_FILE = "goal.txt"
+
+# Supported Currencies
+CURRENCY_SYMBOLS = {
+    "PHP": "₱",
+    "USD": "$",
+    "EUR": "€",
+    "JPY": "¥",
+    "GBP": "£",
+    "INR": "₹",
+    "KRW": "₩"
+}
+
+# Get current hour for greetings
+def get_greeting():
+    hour = datetime.datetime.now().hour
+    if 5 <= hour < 12:
+        return "🌞 Good morning! Time to track your expenses smartly!"
+    elif 12 <= hour < 18:
+        return "🌤 Good afternoon! Let's keep your finances in check!"
+    else:
+        return "🌙 Good evening! Time to review your spending today!"
+
+# Fun function to print colorful messages (just simple string formatting here)
+def print_with_color(message, color_code):
+    colors = {
+        'RED': '\033[91m',
+        'GREEN': '\033[92m',
+        'YELLOW': '\033[93m',
+        'CYAN': '\033[96m',
+        'MAGENTA': '\033[95m',
+        'RESET': '\033[0m'
+    }
+    print(f"{colors.get(color_code, colors['RESET'])}{message}{colors['RESET']}")
+
+# Function to load expenses from file
+def load_expenses():
+    expenses = []
+    if os.path.exists(EXPENSE_FILE):
+        with open(EXPENSE_FILE, mode="r") as file:
+            reader = csv.reader(file)
+            next(reader, None)  # Skip header
+            for row in reader:
+                expenses.append(row)
+    return expenses
+
+# Function to save expense
+def save_expense(category, amount, currency, description):
+    date_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    with open(EXPENSE_FILE, mode="a", newline="") as file:
+        writer = csv.writer(file)
+        writer.writerow([date_time, category, amount, currency, description])
+    print_with_color("\n✅ Expense added successfully! Keep up the good budgeting! 💰", "GREEN")
+
+# Function to add an expense
+def add_expense():
+    print_with_color("\n📝 Time to add a new expense! Let's go! 💥", "YELLOW")
+    category = input("\nEnter category (Food, Transport, Bills, etc.): ").strip()
+    
+    while True:
+        try:
+            amount = float(input("💵 Enter amount: "))
+            if amount < 0:
+                raise ValueError
+            break
+        except ValueError:
+            print_with_color("❌ Oops! That doesn't look like a valid amount. Try again!", "RED")
+
+    print("\n🌍 Supported Currencies: PHP, USD, EUR, JPY, GBP, INR, KRW")
+    currency = input("💱 Enter currency (Default: PHP): ").strip().upper()
+    if currency not in CURRENCY_SYMBOLS:
+        print_with_color("⚠️ Unknown currency, setting default to PHP.", "YELLOW")
+        currency = "PHP"
+    
+    description = input("🖊 Enter a short description: ").strip()
+    save_expense(category, amount, currency, description)
+
+# Function to view all expenses
+def view_expenses():
+    expenses = load_expenses()
+    if not expenses:
+        print_with_color("\n📭 No expenses recorded yet. Start tracking now!\n", "RED")
+        return
+    
+    print_with_color("\n📊 Expense History:", "CYAN")
+    print(f"{'Date & Time':<20}{'Category':<15}{'Amount':<10}{'Currency':<7}{'Description'}")
+    print("-" * 70)
+    for expense in expenses:
+        print(f"{expense[0]:<20}{expense[1]:<15}{expense[2]:<10}{expense[3]:<7}{expense[4]}")
+    print()
+
+# Function to get total expenses
+def total_expenses():
+    expenses = load_expenses()
+    total = sum(float(expense[2]) for expense in expenses if expense[3] == "PHP")
+    print_with_color(f"\n💰 Total Expenses (PHP Only): ₱{total:.2f}\n", "YELLOW")
+    print("🌍 Currency conversion coming soon!\n")
+
+# Function to filter expenses by category
+def filter_expenses():
+    expenses = load_expenses()
+    if not expenses:
+        print_with_color("\n📭 No expenses recorded yet. Start tracking now!\n", "RED")
+        return
+
+    category = input("\n🔍 Enter category to filter: ").strip()
+    filtered = [expense for expense in expenses if expense[1].lower() == category.lower()]
+    
+    if not filtered:
+        print_with_color(f"\n😕 No expenses found under '{category}'.\n", "RED")
+        return
+
+    print_with_color("\n📊 Filtered Expenses:", "CYAN")
+    print(f"{'Date & Time':<20}{'Category':<15}{'Amount':<10}{'Currency':<7}{'Description'}")
+    print("-" * 70)
+    for expense in filtered:
+        print(f"{expense[0]:<20}{expense[1]:<15}{expense[2]:<10}{expense[3]:<7}{expense[4]}")
+    print()
+
+# Function to delete an expense
+def delete_expense():
+    expenses = load_expenses()
+    if not expenses:
+        print_with_color("\n📭 No expenses to delete.\n", "RED")
+        return
+
+    view_expenses()
+    
+    try:
+        index = int(input("\n🗑 Enter the row number to delete (starting from 1): ")) - 1
+        if index < 0 or index >= len(expenses):
+            raise ValueError
+    except ValueError:
+        print_with_color("\n❌ Oops! Invalid selection, please try again.", "RED")
+        return
+
+    del expenses[index]
+    
+    # Save updated list back to CSV
+    with open(EXPENSE_FILE, mode="w", newline="") as file:
+        writer = csv.writer(file)
+        writer.writerow(["Date & Time", "Category", "Amount", "Currency", "Description"])
+        writer.writerows(expenses)
+    
+    print_with_color("\n🗑 Expense deleted successfully!\n", "GREEN")
+
+# Function to add a budget
+def set_budget():
+    try:
+        budget = float(input("\n💰 Set your monthly budget: "))
+        with open(BUDGET_FILE, 'w') as file:
+            file.write(str(budget))
+        print_with_color(f"\n🎯 Monthly budget of ₱{budget} set!", "GREEN")
+    except ValueError:
+        print_with_color("❌ Invalid budget amount, please enter a valid number.", "RED")
+
+# Function to check if the user has exceeded their budget
+def check_budget():
+    try:
+        with open(BUDGET_FILE, 'r') as file:
+            budget = float(file.read())
+    except FileNotFoundError:
+        print_with_color("❌ You haven't set a budget yet. Please set one first.", "RED")
+        return
+
+    expenses = load_expenses()
+    total_spent = sum(float(expense[2]) for expense in expenses if expense[3] == "PHP")
+    
+    if total_spent > budget:
+        print_with_color(f"\n🚨 You have exceeded your budget by ₱{total_spent - budget:.2f}!", "RED")
+    else:
+        print_with_color(f"\n✅ You are within your budget. You've spent ₱{total_spent:.2f} of your ₱{budget} budget.", "GREEN")
+
+# Function to set a savings goal
+def set_savings_goal():
+    try:
+        goal = float(input("\n🎯 Set your savings goal: "))
+        with open(GOAL_FILE, 'w') as file:
+            file.write(str(goal))
+        print_with_color(f"\n🎯 Your savings goal of ₱{goal} has been set!", "GREEN")
+    except ValueError:
+        print_with_color("❌ Invalid goal amount, please enter a valid number.", "RED")
+
+# Function to check progress toward savings goal
+def check_savings_goal():
+    try:
+        with open(GOAL_FILE, 'r') as file:
+            goal = float(file.read())
+    except FileNotFoundError:
+        print_with_color("❌ You haven't set a savings goal yet. Please set one first.", "RED")
+        return
+
+    expenses = load_expenses()
+    total_spent = sum(float(expense[2]) for expense in expenses if expense[3] == "PHP")
+    remaining_goal = goal - total_spent
+    
+    if remaining_goal > 0:
+        print_with_color(f"\n💰 Keep going! You need to save ₱{remaining_goal:.2f} more to reach your goal of ₱{goal}.", "CYAN")
+    else:
+        print_with_color(f"\n🎉 Congratulations! You've reached your savings goal of ₱{goal}!", "YELLOW")
+        time.sleep(1)
+        print_with_color("🎉 🎉 🎉 Confetti time! 🎉 🎉 🎉\n", "YELLOW")
+
+# Fun Challenge
+def random_challenge():
+    challenges = [
+        "Can you keep your coffee under ₱100 this week?",
+        "Try saving 10% of your expenses for the next week!",
+        "Buy lunch for less than ₱150 today!"
+    ]
+    print_with_color(f"\n🎉 Challenge: {random.choice(challenges)}", "MAGENTA")
+
+# Main menu
+def main():
+    print_with_color("\n🎉 Welcome to the Expense Tracker! Let's have fun with finances!", "CYAN")
+    print_with_color(get_greeting(), "CYAN")
+
+    while True:
+        print_with_color("\n🔹 Options:", "CYAN")
+         print("1️⃣ Add Expense")
+        print("2️⃣ View Expenses")
+        print("3️⃣ Total Expenses")
+        print("4️⃣ Filter by Category")
+        print("5️⃣ Delete Expense")
+        print("6️⃣ Set Monthly Budget")
+        print("7️⃣ Check Budget")
+        print("8️⃣ Set Savings Goal")
+        print("9️⃣ Check Savings Goal")
+        print("🔟 Random Challenge") 
+        print("🔹 Exit")
+
+        choice = input("\n💡 Enter choice: ")
+
+        if choice == "1":
+            add_expense()
+        elif choice == "2":
+            view_expenses()
+        elif choice == "3":
+            total_expenses()
+        elif choice == "4":
+            filter_expenses()
+        elif choice == "5":
+            delete_expense()
+        elif choice == "6":
+            set_budget()
+        elif choice == "7":
+            check_budget()
+        elif choice == "8":
+            set_savings_goal()
+        elif choice == "9":
+            check_savings_goal()
+        elif choice == "🔟":
+            random_challenge()
+        elif choice == "🔹":
+            print_with_color("\n👋 Exiting... Keep saving and spending wisely!", "MAGENTA")
+            break
+        else:
+            print_with_color("\n❌ Invalid choice! Please enter a number between 1-10.", "RED")
+
+# Ensure the file exists with headers
+if not os.path.exists(EXPENSE_FILE):
+    with open(EXPENSE_FILE, mode="w", newline="") as file:
+        writer = csv.writer(file)
+        writer.writerow(["Date & Time", "Category", "Amount", "Currency", "Description"])
+
+# Run the program
+if __name__ == "__main__":
+    main()
